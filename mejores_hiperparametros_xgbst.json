@@ -1,0 +1,40 @@
+{
+    "Ocio (Cat 0)": {
+        "objective": "binary:logistic",
+        "eval_metric": "auc",
+        "tree_method": "hist",
+        "random_state": 42,
+        "n_jobs": -1,
+        "n_estimators": 3000,
+        "learning_rate": 0.009012850750787149,
+        "max_depth": 4,
+        "min_child_weight": 1,
+        "subsample": 0.6376088839429148,
+        "colsample_bytree": 0.8883805066663023,
+        "gamma": 2.74175009368039,
+        "reg_alpha": 1.7430825558020364,
+        "reg_lambda": 9.239419982342417,
+        "scale_pos_weight": 3.2312858194355623,
+        "colsample_bylevel": 0.7028493034798078,
+        "max_delta_step": 4
+    },
+    "Trabajo (Cat 1)": {
+        "objective": "binary:logistic",
+        "eval_metric": "auc",
+        "tree_method": "hist",
+        "random_state": 42,
+        "n_jobs": -1,
+        "n_estimators": 1800,
+        "learning_rate": 0.009765552708732379,
+        "max_depth": 5,
+        "min_child_weight": 2,
+        "subsample": 0.6392761328898617,
+        "colsample_bytree": 0.8932036877362795,
+        "gamma": 4.769008388204353,
+        "reg_alpha": 2.3328071396201793,
+        "reg_lambda": 3.022584291609932,
+        "scale_pos_weight": 3.258707253595127,
+        "colsample_bylevel": 0.626937314039772,
+        "max_delta_step": 10
+    }
+}
