@@ -1,0 +1,131 @@
+CASE 
+  -- RAMA PRINCIPAL: RUTAS TURÍSTICAS O MIXTAS (Score <= 0.34)
+  WHEN trip_rt <= 0.34 THEN 
+    CASE 
+      -- Compra Urgente (< 9.5 días)
+      WHEN days_to_departure <= 9.50 THEN 
+        CASE 
+          -- Destino con score muy bajo
+          WHEN trip_destination_city <= 0.19 THEN 0 -- (0) Ocio 
+          ELSE -- Destino > 0.19
+            CASE 
+              -- Ruta muy turística
+              WHEN trip_rt <= 0.31 THEN 
+                CASE 
+                  WHEN has_weekends <= 0.50 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+              ELSE -- Ruta mixta (0.31 - 0.34)
+                CASE 
+                  WHEN ancillary_revenue <= 12.91 THEN 1 
+                  ELSE 1 
+                END
+            END
+        END
+      
+      -- Compra Anticipada (> 9.5 días)
+      ELSE 
+        CASE 
+          -- Destino Turístico
+          WHEN trip_destination_city <= 0.20 THEN 
+            CASE 
+              -- Compra no extrema (< 109 días)
+              WHEN days_to_departure <= 109.50 THEN 
+                CASE 
+                  WHEN length_of_stay <= 5.50 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+              -- Compra muy anticipada (> 109 días)
+              ELSE 
+                CASE 
+                  WHEN month_cos <= 0.93 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+            END
+          -- Destino Corporativo
+          ELSE 
+            CASE 
+              -- Viajeros Solos
+              WHEN paxs <= 1.50 THEN 
+                CASE 
+                  WHEN trip_origin_city <= 0.28 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+              -- Grupos
+              ELSE 
+                CASE 
+                  WHEN fare_revenue <= 102.22 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+            END
+        END
+    END
+
+  -- RAMA PRINCIPAL: RUTAS CORPORATIVAS (Score > 0.34)
+  ELSE 
+    CASE 
+      -- Viajeros Solos
+      WHEN paxs <= 1.50 THEN 
+        CASE 
+          -- Días de Semana (Lun-Jue)
+          WHEN trip_start_dow <= 3.50 THEN 
+            CASE 
+              -- Viaje relámpago (1 día)
+              WHEN length_of_stay <= 1.50 THEN 
+                CASE 
+                  WHEN dow_cos <= 0.81 THEN 1 
+                  ELSE 1 
+                END
+              -- Viaje normal
+              ELSE 
+                CASE 
+                  WHEN trip_destination_city <= 0.39 THEN 1 
+                  ELSE 1 
+                END
+            END
+          -- Fines de Semana (Vie-Dom)
+          ELSE 
+            CASE 
+              -- Ida y vuelta mismo día
+              WHEN length_of_stay <= 0.50 THEN 
+                CASE 
+                  WHEN trip_rt <= 0.56 THEN 1 
+                  ELSE 1 
+                END
+              -- Estadía > 1 día
+              ELSE 
+                CASE 
+                  WHEN has_promo <= 0.50 THEN 1 
+                  ELSE 0 
+                END
+            END
+        END
+      
+      -- Grupos
+      ELSE 
+        CASE 
+          -- Compra Urgente (< 6.5 días)
+          WHEN days_to_departure <= 6.50 THEN 
+            CASE 
+              WHEN fare_revenue <= 97.56 THEN 0 -- (0) Ocio
+              ELSE 1 -- Caso interesante: Grupo pagando caro = Trabajo
+            END
+          -- Compra Normal/Anticipada
+          ELSE 
+            CASE 
+              -- Sin Niños
+              WHEN has_chd_inf <= 0.50 THEN 
+                CASE 
+                  WHEN has_seat <= 0.50 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+              -- Con Niños
+              ELSE 
+                CASE 
+                  WHEN trip_rt <= 0.53 THEN 0 -- (0) Ocio
+                  ELSE 0 
+                END
+            END
+        END
+    END
+END AS prediccion_trip_type

@@ -1,0 +1,107 @@
+CASE 
+  -- RAMA 1: VIAJEROS SOLITARIOS (Ocio/Trabajo Mezclado)
+  WHEN paxs <= 1.50 THEN 
+    CASE 
+      -- Sub-rama: Rutas Turísticas o Mixtas (Score <= 0.26)
+      WHEN trip_rt <= 0.26 THEN 
+        CASE 
+          -- Compra Urgente (< 14 días)
+          WHEN days_to_departure <= 13.50 THEN 
+            CASE 
+              -- Días de Semana
+              WHEN has_weekends <= 0.50 THEN 
+                CASE WHEN trip_type_1 <= 0.50 THEN 1 ELSE 1 END
+              -- Fines de Semana
+              ELSE 
+                -- Si la ruta es MUY turística (< 0.17) -> OCIO
+                -- Si es mixta (0.17 - 0.26) -> TRABAJO
+                CASE WHEN trip_rt <= 0.17 THEN 0 ELSE 1 END
+            END
+          -- Compra Anticipada (> 14 días)
+          ELSE 
+            CASE 
+              -- Rutas turísticas
+              WHEN trip_rt <= 0.22 THEN 
+                CASE WHEN trip_rt <= 0.09 THEN 0 ELSE 0 END
+              -- Rutas un poco más corporativas
+              ELSE 
+                -- Si NO tiene descuento -> Trabajo
+                -- Si TIENE descuento -> OCIO 
+                CASE WHEN has_discount <= 0.50 THEN 1 ELSE 0 END
+            END
+        END
+
+      -- Sub-rama: Rutas Corporativas (Score > 0.26)
+      ELSE 
+        CASE 
+          -- Días de Semana
+          WHEN has_weekends <= 0.50 THEN 
+            CASE 
+              -- Rutas intermedias
+              WHEN trip_rt <= 0.44 THEN 
+                CASE WHEN days_to_departure <= 9.50 THEN 1 ELSE 1 END
+              -- Rutas MUY corporativas
+              ELSE 
+                CASE WHEN dow_sin <= 0.61 THEN 1 ELSE 1 END
+            END
+          -- Fines de Semana en Rutas Corporativas
+          ELSE 
+            CASE 
+              -- Origen Turístico (Score <= 0.24)
+              WHEN trip_origin_city <= 0.24 THEN 
+                -- Si compra con < 25 días -> TRABAJO
+                -- Si compra con > 25 días -> OCIO
+                CASE WHEN days_to_departure <= 24.50 THEN 1 ELSE 0 END
+              -- Origen Corporativo
+              ELSE 
+                CASE WHEN dow_sin <= 0.61 THEN 1 ELSE 1 END
+            END
+        END
+    END
+
+  -- RAMA 2: GRUPOS (Principalmente Ocio)
+  ELSE 
+    CASE 
+      -- Compra Urgente (< 16 días)
+      WHEN days_to_departure <= 15.50 THEN 
+        CASE 
+          -- Sin Niños
+          WHEN has_chd_inf <= 0.50 THEN 
+            CASE 
+              -- Viaje Corto (< 5 días)
+              WHEN length_of_stay <= 4.50 THEN 
+                -- Si la ruta es corporativa (> 0.24) 
+                CASE WHEN trip_rt <= 0.24 THEN 0 ELSE 1 END
+              -- Viaje Largo -> OCIO
+              ELSE 
+                -- Respetando redundancia
+                CASE WHEN trip_rt <= 0.24 THEN 0 ELSE 0 END
+            END
+          -- Con Niños -> OCIO
+          ELSE 
+            CASE 
+              WHEN trip_origin_city <= 0.22 THEN 
+                 CASE WHEN paxs <= 3.50 THEN 0 ELSE 0 END
+              ELSE 
+                 CASE WHEN days_to_departure <= 10.50 THEN 0 ELSE 0 END
+            END
+        END
+      
+      -- Compra Anticipada (> 16 días) -> OCIO 
+      ELSE 
+        CASE 
+          WHEN trip_rt <= 0.24 THEN 
+            CASE WHEN trip_rt <= 0.14 THEN 
+               CASE WHEN paxs <= 3.50 THEN 0 ELSE 0 END
+            ELSE 
+               CASE WHEN has_chd_inf <= 0.50 THEN 0 ELSE 0 END
+            END
+          ELSE 
+            CASE WHEN has_chd_inf <= 0.50 THEN 
+               CASE WHEN month_cos <= -0.25 THEN 0 ELSE 0 END
+            ELSE 
+               CASE WHEN paxs <= 2.50 THEN 0 ELSE 0 END
+            END
+        END
+    END
+END AS prediccion_trip_type
